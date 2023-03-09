@@ -1,0 +1,58 @@
+device: 1
+epochs: 100
+early_stop_steps: 20
+
+trainer:
+  max_grad_norm: 3
+  reg_weight_decay: 0.001
+  reg_norm: 2
+
+data:
+  dataset: METR-LA
+  batch-size: 64
+  input_dim: 2
+  output_dim: 1
+
+optimizer:
+  name: Adam
+  Adam:
+    lr: 0.001
+    weight_decay: 0.0001
+    amsgrad: true
+  RMSprop:
+    lr: 0.001
+    weight_decay: 0.0001
+
+loss:
+  name: MaskedMAELoss
+
+model:
+  TGraphormer:
+    in_dim: 2
+    embed_dim: 128
+    num_of_timesteps: 12
+    num_heads: 2
+    d_ff: 256
+    kernel_size: 2
+    N: 5
+    max_degree: 207
+    end_dim: 256
+    out_dim: 1
+    dropout: 0.1
+
+scheduler:
+  name: null
+  ReduceLROnPlateau:
+    factor: 0.2
+    patience: 5
+    threshold: 0.005
+    min_lr: 0.00001
+  StepLR:
+    step_size: 10
+    gamma: 0.1
+  MultiStepLR:
+    milestones: [2, 10, 20, 50]
+    gamma: 0.3
+  CosineAnnealingLR:
+    T_max: 5
+    eta_min: 0.0000001
