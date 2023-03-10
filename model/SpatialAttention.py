@@ -107,7 +107,8 @@ class SpatialAttention(nn.Module):
             self.head_dim * num_heads == self.embed_dim
         ), "embed_dim must be divisible by num_heads"
         self.attention_layer=MultiheadAttention(embed_dim,num_heads,bias)
-        self.enter=nn.Conv2d(src_len, 1, kernel_size=(1, 1))
+        # self.enter=nn.Conv2d(src_len, 1, kernel_size=(1, 1))
+        self.enter=nn.Linear(embed_dim*src_len, embed_dim)
         self.v_con=nn.Conv2d(in_dim,self.head_dim,kernel_size=(1,1))
         self.dropout = nn.Dropout(dropout)
         # self.reset_parameters()
@@ -121,7 +122,7 @@ class SpatialAttention(nn.Module):
     ) : 
         bsz=input.shape[0]
         #input=[b*src_len*n*embed_dim]
-        x=self.enter(input).squeeze(1)
+        x=self.enter(input.transpose(1,3).contiguous().view(bsz,-1,self.src_len*self.embed_dim))
         #x=[b*n*embed_dim],in_degree_emb=out_degree_emb=[n*embed_dim]
         x=x+in_degree_emb+out_degree_emb
         #attn_prob=[b*head_dim*n*n]
